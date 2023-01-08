@@ -85,7 +85,17 @@ class TestValue(unittest.TestCase):
         b.backward()
         self.assertEqual(a.grad, -1)
 
+        # Verify that neg() is equivalent to multiplying by -1
         c = micrograd.autodiff.Value(-1) * a
         self.assertEqual(c.data, b.data)
         c.backward()
         self.assertEqual(c.grad, b.grad)
+
+    def test_tanh(self):
+        a = micrograd.autodiff.Value(0)
+        b = a.tanh()
+        self.assertAlmostEqual(math.tanh(a.data), b.data, places=2)
+
+        b.backward()
+        # Derivative derived numerically
+        self.assertAlmostEqual(a.grad, numerical_diff(lambda x: math.tanh(x), 0))

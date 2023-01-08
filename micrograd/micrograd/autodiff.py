@@ -51,6 +51,7 @@ class Value:
         return mul(self, other)
 
     def __truediv__(self, other):
+        # truediv is normal division ie 2/3 = 0.666... not 0.
         return mul(self, pow(other, Value(-1)))
 
     def __pow__(self, other):
@@ -60,10 +61,12 @@ class Value:
         return mul(Value(-1), self)
 
     def tanh(self):
-        t = (math.exp(2**self.data) - 1) / (math.exp(2**self.data) + 1)
+        # tanh(x) = (e^(2x) - 1) / (e^(2x) + 1)
+        t = (math.exp(2*self.data) - 1) / (math.exp(2*self.data) + 1)
         out = Value(t, children=(self,), op="tanh")
 
         def _backward():
+            # d/dx[ tanh(x) ] = 1 - tanh(x)^2
             self.grad += (1 - t**2) * out.grad
         out._backward = _backward
 
